@@ -1,0 +1,93 @@
+PROJ_ECOM_API
+Descripción:
+API backend de un e-commerce de venta de artículos deportivos que se divide en varios módulos 
+que permiten gestionar usuarios, productos, carritos y órdenes. 
+
+"El proyecto está construido con las siguientes tecnologías:"
+•	Node.js + Express: para la creación del servidor y manejo de rutas.
+•	MongoDB Atlas: como base de datos en la nube.
+•	Mongoose: para modelar los datos.
+•	CryptoJS: para encriptar contraseñas de usuarios.
+•	jsonwebtoken (JWT): para autenticación y protección de rutas.
+•	dotenv: para el manejo seguro de variables de entorno.
+•	Postman: para pruebas de los endpoints.
+
+La API sigue una arquitectura modular:
+1.	Modelos (MongoDB Atlas / Mongoose)
+    a.	User.js : Usuario (nombre, contraseña encriptada y administradores)
+    b.	Product.js: Productos en venta (nombre precio, categoría, etc)
+    c.	Cart.js : Carrito de usuario, que contendrá los productos seleccionados.
+    d.	Order.js: Orden o pedido del usuario (incluye dirección y estado).
+2.	Autenticación (auth.js + verifyToken.js)
+    a.	JWT para autenticar usuarios al iniciar sesión.
+    b.	CryptoJS para encriptar contraseña al registrarse.
+    c.	El token incluye headers para validar el acceso a rutas protegidas.
+    
+    "El sistema incluye autenticación con tokens JWT y autorización con roles:"
+    •	El token se genera al hacer login.
+    •	Se usa en los headers de las peticiones protegidas.
+    •	Hay tres tipos de middleware:
+            o	verifyToken → cualquier usuario autenticado
+            o	verifyTokenAndAuthorization → usuarios dueños de recursos o admins
+            o	verifyTokenAndAdmin → solo administradores
+
+3.	Rutas (CRUD) cada archivo routes/ maneja un recurso
+    a.	/api/auth	Registro e inicio de sesión
+    b.	/api/users	Obtener, actualizar y eliminar usuarios (admin)
+    c.	/api/products 	CRUD de productos (solo admin) + Busqueda y selección (usuarios)
+    d.	/api/carts	CRUD de carrito de usuarios
+    e.	/api/orders	CRUD de ordenes + cálculo de ingresos mensuales
+    f.	Verifytoken	Funciones de middleware para proteger rutas.
+4.	Index.js
+    a.	Punto de entrada principal
+    b.	Conecta a MongoDB Atlas
+    c.	Carga las rutas
+    d.	Levanta el servidor en el puerto 5000
+5.	.env 
+    a.	Claves de crypto.js
+    b.	Claves de JWT
+    c.	Credenciales de bd.
+6.	.gitignore
+    a.	Para subirlo al repositorio sin todos los archivos del node_modules y por seguridad los del .env.
+
+Funcionalidades de usuarios (/api/users)
+•	PUT /users/:id → Actualiza un usuario (encripta la nueva contraseña)
+•	DELETE /users/:id → Elimina un usuario
+•	GET /users/find/:id → Obtiene datos de un usuario
+•	GET /users/ → Lista todos los usuarios (admin)
+•	GET /users/stats → Estadísticas por mes de registro
+
+Funcionalidades del carrito (/api/carts)
+•	POST /carts/ → Crear carrito (usuario logueado)
+•	PUT /carts/:id → Editar carrito
+•	DELETE /carts/:id → Eliminar carrito
+•	GET /carts/find/:userId → Obtener carrito por usuario
+•	GET /carts/ → Obtener todos los carritos (admin)
+
+Funcionalidades de productos (/api/products)
+•	POST (solo admin) → Crear producto
+•	PUT / DELETE → Actualizar o eliminar producto por ID
+•	GET /products/ → Lista todos los productos (filtros por categoría o nuevos)
+•	GET /products/find/:id → Buscar un producto por ID
+
+Funcionalidades de órdenes (/api/orders)
+•	POST → Crear una orden (usuario)
+•	PUT / DELETE → Actualizar/eliminar orden (admin)
+•	GET /orders/find/:userId → Ver órdenes de un usuario
+•	GET /orders/ → Ver todas las órdenes (admin)
+
+Pruebas con Postman 
+"Usé Postman para probar cada endpoint. Aquí algunos ejemplos:"
+•	Registro de usuario y login con generación de token.
+•	Envío de token en headers: headers: { token: "Bearer <JWT>" }
+•	Pruebas CRUD con productos, usuarios y órdenes.
+
+ Conclusiones y mejoras futuras
+Este proyecto me permitió aplicar conceptos clave del desarrollo backend como 
+autenticación, seguridad, modelado de datos y manejo de errores. 
+Algunas mejoras que quiero implementar:
+    Separar controladores para mantener rutas mas limpias
+•	Validaciones de datos con Joi o express-validator.
+•	Paginación y búsqueda avanzada.
+•	Integración con frontend o consumo desde React.
+•	Mejor manejo de errores personalizados y logs.
